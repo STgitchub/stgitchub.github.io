@@ -171,6 +171,44 @@
         </div>
     </div>
 
+    <div class="container mx-auto max-w-7xl bg-white rounded-xl shadow-lg overflow-hidden main-content-container">
+        <div class="md:flex">
+            <div class="md:w-1/3 lg:w-1/4 p-6 border-r border-slate-200 bg-slate-50">
+                <h2 class="text-xl font-semibold mb-4 text-slate-700">Customize Style</h2>
+                <div class="mb-6 pb-4 border-b border-slate-200">
+                    <h3 class="text-sm font-medium text-slate-500 mb-2">Add Section</h3>
+                    <div class="flex flex-wrap gap-2">
+                         <button id="addH1Btn" class="add-section-btn" title="Add Heading 1"><span class="lucide-icon icon-heading-1"></span> H1</button>
+                         <button id="addH2Btn" class="add-section-btn" title="Add Heading 2"><span class="lucide-icon icon-heading-2"></span> H2</button>
+                         <button id="addPBtn" class="add-section-btn" title="Add Paragraph"><span class="lucide-icon icon-pilcrow"></span> P</button>
+                    </div>
+                </div>
+                <div id="controlsContainer" class="space-y-6">
+                    <p id="controlsPrompt" class="text-sm text-slate-500 italic p-4">Click an element in the preview to customize its style</p>
+                </div>
+            </div>
+
+            <div class="md:w-2/3 lg:w-3/4 p-8 md:p-12">
+                 <div id="previewArea" class="space-y-8">
+                    <h1 contenteditable="true" data-element-type="h1">Editable Title</h1>
+                    <h2 contenteditable="true" data-element-type="h2">Editable Subtitle</h2>
+                    <p contenteditable="true" data-element-type="p">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </p>
+                 </div>
+                 <div class="mt-12 pt-6 border-t border-slate-200">
+                    <h3 class="text-lg font-semibold mb-3 text-slate-700">Generated CSS</h3>
+                    <div class="relative">
+                        <pre id="cssOutput" class="bg-slate-800 text-slate-200 p-4 rounded-lg text-sm overflow-auto max-h-60 font-mono"></pre>
+                        <button id="copyCssButton" title="Copy CSS" class="lucide-icon icon-copy absolute top-3 right-3 p-1.5 bg-slate-600 hover:bg-slate-500 text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"><span class="sr-only">Copy CSS</span></button>
+                        <span id="copyMessage" class="absolute top-12 right-3 text-xs text-green-500 bg-slate-700 px-2 py-1 rounded opacity-0 transition-opacity duration-300">Copied!</span>
+                    </div>
+                    <p id="statusMessage" class="text-sm text-red-600 mt-2 font-medium"></p>
+                 </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const googleFonts = [ "Poppins", "Roboto", "Open Sans", "Noto Sans Japanese", "Montserrat", "Lato", "Inter", "Roboto Condensed", "Roboto Mono", "Oswald", "Raleway", "Nunito Sans", "Nunito", "Ubuntu", "Rubik", "Playfair Display", "Merriweather", "Noto Sans Korean", "Roboto Slab", "PT Sans", "Kanit", "Work Sans", "Mulish", "Lora", "DM Sans", "Noto Sans Traditional Chinese", "Fira Sans", "Quicksand", "Barlow", "Inconsolata", "Manrope", "Hind Siliguri", "Heebo", "Titillium Web", "IBM Plex Sans", "PT Serif", "Noto Serif", "Karla", "Bebas Neue", "Nanum Gothic", "Schibsted Grotesk", "Libre Franklin", "Outfit", "Noto Color Emoji", "Josefin Sans", "Jost", "Libre Baskerville", "Source Sans 3", "Mukta", "Arial", "Verdana", "Tahoma", "Trebuchet MS", "Times New Roman", "Georgia", "Garamond", "Courier New", "Brush Script MT" ];
         const fontSizes = [ "8px", "10px", "12px", "14px", "16px", "18px", "20px", "24px", "28px", "32px", "36px", "40px", "48px", "56px", "64px", "72px", "80px", "96px" ];
