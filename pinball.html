@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinball Machine (Comments Removed)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            background-color: #f0f4f8;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #d1d5db;
+            border-radius: 5px;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+            cursor: pointer;
+        }
+        input[type="range"]:hover {
+            opacity: 1;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #3b82f6;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #3b82f6;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-color: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            cursor: pointer;
+            width: 100%;
+        }
+        select:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+        }
+        .controls-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .controls-container::-webkit-scrollbar-track {
+            background: #e5e7eb;
+            border-radius: 3px;
+        }
+        .controls-container::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 3px;
+        }
+        .controls-container::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        #ballPickupArea {
+            cursor: grab;
+            transition: background-color 0.2s ease-in-out, width 0.2s, height 0.2s;
+        }
+        #ballPickupArea:active {
+            cursor: grabbing;
+        }
+        #messageBox {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 8px;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            pointer-events: none;
+            text-align: center;
+        }
+        #messageBox.show {
+            opacity: 1;
+        }
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        #resizeDivider {
+            width: 8px;
+            background-color: #9ca3af;
+            cursor: col-resize;
+            flex-shrink: 0;
+            z-index: 10;
+            transition: background-color 0.2s ease;
+        }
+        #resizeDivider:hover {
+            background-color: #6b7280;
+        }
+        #simulationContainer {
+            position: relative;
+            overflow: hidden;
+        }
+        #scoreContainer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            pointer-events: none;
+            display: flex;
+            z-index: 5;
+        }
+        .score-label {
+            position: absolute;
+            bottom: 8px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            text-align: center;
+            white-space: nowrap;
+            text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex h-screen no-select">
+
+    <div style="user-select: none; display: flex; justify-content: space-between; align-items: stretch; background-color: #2c3e50; padding: 0; margin: 0; width: 100%; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 55px; line-height: 55px;">
+        <a href="index.html" style="color: #ecf0f1; text-decoration: none; padding: 0 25px; font-size: 1.1em; font-weight: bold; display: flex; align-items: center; transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">Home</a>
+        <div style="display: flex; align-items: stretch;">
+            <div style="user-select: none; position: relative; display: inline-block;" onmouseover="this.children[1].style.display='block'" onmouseout="this.children[1].style.display='none'">
+                <button style="background-color: transparent; color: #ecf0f1; border: none; padding: 0 20px; cursor: pointer; font-size: 1em; height: 100%; transition: background-color 0.3s ease; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">
+                    Games &#9662; </button>
+                <div style="display: none; position: absolute; right: 0; top: 100%; background-color: #34495e; min-width: 200px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1; border-radius: 0 0 4px 4px; overflow: hidden; line-height: 1.5;">
+                    <a href="poker.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Poker</a>
+                    <a href="snake.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Snake</a>
+                    <a href="minesweeper.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Minesweeper</a>
+                </div>
+            </div>
+            <div style="position: relative; display: inline-block;" onmouseover="this.children[1].style.display='block'" onmouseout="this.children[1].style.display='none'">
+                <button style="user-select: none; background-color: transparent; color: #ecf0f1; border: none; padding: 0 20px; cursor: pointer; font-size: 1em; height: 100%; transition: background-color 0.3s ease; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">
+                    Math &#9662;
+                </button>
+                <div style="display: none; position: absolute; right: 0; top: 100%; background-color: #34495e; min-width: 280px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1; border-radius: 0 0 4px 4px; overflow: hidden; line-height: 1.5;">
+                    <a href="Graphing_Calculator.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Graphing Calculator</a>
+                    <a href="Interactive_Fractal_Generator.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Interactive Fractal Generator</a>
+                    <a href="Significance_Tests_and_Confidence_Intervals.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Significance Tests and CIs</a>
+                </div>
+            </div>
+            <div style="user-select: none; position: relative; display: inline-block;" onmouseover="this.children[1].style.display='block'" onmouseout="this.children[1].style.display='none'">
+                <button style="background-color: transparent; color: #ecf0f1; border: none; padding: 0 20px; cursor: pointer; font-size: 1em; height: 100%; transition: background-color 0.3s ease; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">
+                    HTML &#9662;
+                </button>
+                <div style="display: none; position: absolute; right: 0; top: 100%; background-color: #34495e; min-width: 280px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1; border-radius: 0 0 4px 4px; overflow: hidden; line-height: 1.5;">
+                    <a href="Google_Docs_Style_Editor.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Google Docs Style Editor</a>
+                    <a href="UI_Color_Builder.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">UI Color Builder</a>
+                    <a href="Text_Editor_with_Terminal.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Text Editor with Terminal</a>
+                </div>
+            </div>
+            <div style="user-select: none; position: relative; display: inline-block;" onmouseover="this.children[1].style.display='block'" onmouseout="this.children[1].style.display='none'">
+                <button style="background-color: transparent; color: #ecf0f1; border: none; padding: 0 20px; cursor: pointer; font-size: 1em; height: 100%; transition: background-color 0.3s ease; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">
+                    Others &#9662;
+                </button>
+                <div style="display: none; position: absolute; right: 0; top: 100%; background-color: #34495e; min-width: 250px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1; border-radius: 0 0 4px 4px; overflow: hidden; line-height: 1.5;">
+                    <a href="Task_Tracker.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Task Tracker</a>
+                    <a href="ASCII_Art_Generator.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">ASCII Art Generator</a>
+                    <a href="Interactive_Electoral_Map.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Interactive Electoral Map</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="controlsPanel" class="w-96 bg-white shadow-lg p-4 space-y-4 overflow-y-auto controls-container flex flex-col flex-shrink-0">
+        <h2 class="text-xl font-bold text-gray-700 text-center">Controls</h2>
+
+        <div class="text-center space-y-2 pt-2">
+             <p class="text-sm text-gray-600">Click & Drag Ball:</p>
+             <div id="ballPickupArea" class="bg-red-500 rounded-full mx-auto border-2 border-red-700 shadow-md flex items-center justify-center">
+                 </div>
+        </div>
+
+        <div class="space-y-3 flex-grow">
+            <div>
+                <label for="pinShapeSelect" class="block text-sm font-medium text-gray-700">Pin Layout:</label>
+                <select id="pinShapeSelect" name="pinShape">
+                    <option value="square" selected>Square</option>
+                    <option value="triangle">Trapezoid</option>
+                    <option value="triangle_inverted">Inverted Trapezoid</option>
+                    <option value="oval">Oval</option>
+                    <option value="diamond">Diamond</option>
+                    <option value="hourglass">Hourglass</option>
+                    </select>
+            </div>
+            <div>
+                <label for="pinDensitySlider" class="block text-sm font-medium text-gray-700">Pin Density Factor: <span id="pinDensityValue">15</span></label>
+                <input type="range" id="pinDensitySlider" min="3" max="20" value="15" class="w-full">
+            </div>
+             <div>
+                <label for="ballSizeSlider" class="block text-sm font-medium text-gray-700">Ball Size: <span id="ballSizeValue">10</span>px</label>
+                <input type="range" id="ballSizeSlider" min="5" max="20" value="10" class="w-full">
+            </div>
+            <div>
+                <label for="numSlotsSlider" class="block text-sm font-medium text-gray-700">Number of Slots: <span id="numSlotsValue">7</span></label>
+                <input type="range" id="numSlotsSlider" min="2" max="11" value="7" class="w-full">
+            </div>
+            <div>
+                 <label class="block text-sm font-medium text-gray-700">Slot Distribution</label>
+                 <div id="slotValueDisplay" class="mt-1 text-xs text-center text-gray-600 bg-gray-100 p-1 rounded">30 | 10 | 20 | 100 | 20 | 10 | 30</div>
+             </div>
+        </div>
+
+        <button id="resetButton" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out">
+            Reset
+        </button>
+    </div>
+
+    <div id="resizeDivider"></div>
+
+    <div id="simulationContainer" class="flex-grow bg-gray-300 relative">
+        <div id="scoreContainer"></div>
+        <div id="messageBox">Score: 100</div>
+    </div>
+
+    <script>
+        const Engine = Matter.Engine;
+        const Render = Matter.Render;
+        const Runner = Matter.Runner;
+        const Bodies = Matter.Bodies;
+        const Composite = Matter.Composite;
+        const Composites = Matter.Composites;
+        const Common = Matter.Common;
+        const MouseConstraint = Matter.MouseConstraint;
+        const Mouse = Matter.Mouse;
+        const Events = Matter.Events;
+        const Body = Matter.Body;
+
+        const controlsPanel = document.getElementById('controlsPanel');
+        const resizeDivider = document.getElementById('resizeDivider');
+        const simulationContainer = document.getElementById('simulationContainer');
+        const messageBox = document.getElementById('messageBox');
+        const scoreContainer = document.getElementById('scoreContainer');
+        const pinShapeSelect = document.getElementById('pinShapeSelect');
+        const pinDensitySlider = document.getElementById('pinDensitySlider');
+        const ballSizeSlider = document.getElementById('ballSizeSlider');
+        const numSlotsSlider = document.getElementById('numSlotsSlider');
+        const resetButton = document.getElementById('resetButton');
+        const ballPickupArea = document.getElementById('ballPickupArea');
+        const slotValueDisplay = document.getElementById('slotValueDisplay');
+        const pinDensityValue = document.getElementById('pinDensityValue');
+        const ballSizeValue = document.getElementById('ballSizeValue');
+        const numSlotsValue = document.getElementById('numSlotsValue');
+
+        let engine;
+        let render;
+        let runner;
+        let world;
+        let mouseConstraint;
+        let currentBall = null;
+        let ballDragging = false;
+        let pinShape = 'square';
+        const effectivePinBounciness = 1;
+        let ballRadius = 10;
+        let numSlots = 5;
+        let slotValues = [30, 10, 100, 10, 30];
+        let isDividerResizing = false;
+        const SLOT_AREA_HEIGHT = 60;
+
+        const STORAGE_KEY = 'pinballSettings';
+
+        const defaultSettings = {
+            pinShape: 'square',
+            pinDensity: 15,
+            ballSize: 10,
+            numSlots: 7
+        };
+
+        function saveSettings() {
+            const settingsToSave = {
+                pinShape: pinShapeSelect.value,
+                pinDensity: parseInt(pinDensitySlider.value),
+                ballSize: parseInt(ballSizeSlider.value),
+                numSlots: parseInt(numSlotsSlider.value)
+             };
+            if (chrome && chrome.storage && chrome.storage.local) {
+                 chrome.storage.local.set({ [STORAGE_KEY]: settingsToSave }, () => {
+                     if (chrome.runtime.lastError) console.error("Error saving settings:", chrome.runtime.lastError);
+                 });
+             } else {
+                 console.warn("chrome.storage.local not available. Settings will not be saved.");
+             }
+        }
+
+        function applySettings(settings) {
+            pinShapeSelect.value = settings.pinShape;
+            pinDensitySlider.value = settings.pinDensity;
+            ballSizeSlider.value = settings.ballSize;
+            numSlotsSlider.value = settings.numSlots;
+
+            pinDensityValue.textContent = settings.pinDensity;
+            ballSizeValue.textContent = settings.ballSize;
+            numSlotsValue.textContent = settings.numSlots;
+
+            pinShape = settings.pinShape;
+            ballRadius = settings.ballSize;
+            numSlots = settings.numSlots;
+
+            const initialBallDiameter = ballRadius * 2;
+            ballPickupArea.style.width = `${initialBallDiameter + 4}px`;
+            ballPickupArea.style.height = `${initialBallDiameter + 4}px`;
+
+            setupAllEventListeners();
+            initSimulation();
+        }
+
+        function initSimulation() {
+            if (render) { Events.off(render); Render.stop(render); if (render.canvas) render.canvas.remove(); render.textures = {}; }
+            if (runner) Runner.stop(runner);
+            if (engine) { Events.off(engine); Composite.clear(engine.world, false); Engine.clear(engine); }
+
+            const canvasWidth = simulationContainer.offsetWidth;
+            const canvasHeight = simulationContainer.offsetHeight;
+            const finalCanvasWidth = Math.max(100, canvasWidth);
+            const finalCanvasHeight = Math.max(100, canvasHeight);
+
+            pinShape = pinShapeSelect.value;
+            const pinDensityFactor = parseInt(pinDensitySlider.value);
+            ballRadius = parseInt(ballSizeSlider.value);
+            numSlots = parseInt(numSlotsSlider.value);
+
+            pinDensityValue.textContent = pinDensityFactor;
+            ballSizeValue.textContent = ballRadius;
+            numSlotsValue.textContent = numSlots;
+
+            engine = Engine.create({ gravity: { x: 0, y: 1 } });
+            world = engine.world;
+            render = Render.create({ element: simulationContainer, engine: engine, options: { width: finalCanvasWidth, height: finalCanvasHeight, wireframes: false, background: '#cbd5e1' } });
+            runner = Runner.create();
+
+            slotValues = generateSlotValues(numSlots);
+            createBoundaries(finalCanvasWidth, finalCanvasHeight);
+            createPins(finalCanvasWidth, finalCanvasHeight, pinDensityFactor, 5, pinShape);
+            createSlots(finalCanvasWidth, finalCanvasHeight, numSlots, slotValues);
+            updateSlotValueDisplay();
+            displaySlotScores(slotValues, finalCanvasWidth, finalCanvasHeight);
+
+            const mouse = Mouse.create(render.canvas);
+            mouseConstraint = MouseConstraint.create(engine, { mouse: mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
+            mouseConstraint.collisionFilter.mask = 0x0001;
+            Composite.add(world, mouseConstraint);
+            render.mouse = mouse;
+
+            setupCollisionHandling();
+            Runner.run(runner, engine);
+            Render.run(render);
+
+            if (!isDividerResizing) resetBallState();
+        }
+
+        function createBoundaries(width, height) {
+            const wallThickness = 50; const wallOptions = { isStatic: true, render: { fillStyle: '#64748b' } }; Composite.add(world, [ Bodies.rectangle(-wallThickness / 2, height / 2, wallThickness, height, wallOptions), Bodies.rectangle(width + wallThickness / 2, height / 2, wallThickness, height, wallOptions), Bodies.rectangle(width / 2, -wallThickness / 2, width, wallThickness, wallOptions) ]);
+        }
+
+        function createPins(width, height, densityFactor, pinRadius, shape) {
+             if (densityFactor < 1) densityFactor = 1;
+             const pinOptions = { isStatic: true, restitution: effectivePinBounciness, friction: 0.1, label: 'pin', render: { fillStyle: '#475569' }};
+             const pinAreaHeight = height * 0.6; const buffer = pinRadius + 2; const pinAreaWidth = Math.max(pinRadius * 4, width - (buffer * 2)); const startY = height * 0.20; const startXOffset = buffer; const endY = height - SLOT_AREA_HEIGHT - buffer; const baseSpacing = Math.max(pinRadius * 4, 75 - densityFactor * 2); const baseRows = Math.max(3, Math.floor(pinAreaHeight / baseSpacing)); const baseCols = Math.max(3, Math.floor(pinAreaWidth / baseSpacing)); const addPin = (x, y) => { const clampedX = Math.max(buffer + pinRadius, Math.min(width - buffer - pinRadius, x)); const clampedY = Math.max(startY + pinRadius, Math.min(endY - pinRadius, y)); if (clampedY >= startY + pinRadius && clampedY <= endY - pinRadius) { Composite.add(world, Bodies.circle(clampedX, clampedY, pinRadius, pinOptions)); return { x: clampedX, y: clampedY }; } return null; }; const densityMultiplier = 1.5; switch (shape) { case 'triangle': { const r=Math.max(3,densityFactor),s=pinAreaHeight/Math.max(1,r-1);for(let o=0;o<r;o++){const n=Math.max(2,Math.floor((o+2+baseCols*densityMultiplier)/2)),a=startY+o*s,l=n>1?pinAreaWidth/(n-1):0,p=startXOffset;for(let t=0;t<n;t++)addPin(p+t*l,a)}break} case 'triangle_inverted': { const r=Math.max(3,densityFactor),s=pinAreaHeight/Math.max(1,r-1);for(let o=0;o<r;o++){const n=r+1-o,a=Math.max(2,Math.floor((n+baseCols*densityMultiplier)/2)),l=startY+o*s,p=a>1?pinAreaWidth/(a-1):0,t=startXOffset;for(let e=0;e<a;e++)addPin(t+e*p,l)}break} case 'square': default: { const r=baseRows,s=baseCols,o=s>1?pinAreaWidth/(s-1):pinAreaWidth,n=r>1?pinAreaHeight/(r-1):pinAreaHeight;for(let a=0;a<r;a++){const l=startY+a*n,p=a%2==1?o/2:0,t=a%2==1?s-1:s;for(let e=0;e<t;e++)t>0&&addPin(startXOffset+p+e*o,l)}break} case 'oval': { const r=pinAreaWidth/2,s=pinAreaHeight/2,o=Math.max(1,Math.floor(baseRows/2)),n=1+pinAreaWidth/800,a=startXOffset+r,l=startY+s;baseRows>0&&addPin(a,l);for(let p=1;p<=o;p++){const t=(p/o)*r,e=(p/o)*s,i=Math.max(6,Math.floor((baseRows*(1.5*densityMultiplier)+p*(3*densityMultiplier))*n));for(let d=0;d<i;d++){const h=(d/i)*Math.PI*2;addPin(a+t*Math.cos(h),l+e*Math.sin(h))}}break} case 'diamond': { const r=pinAreaWidth/2,s=pinAreaHeight/2,o=startXOffset+r,n=startY+s,a=Math.max(2,Math.floor((baseRows*.8+baseCols*densityMultiplier)/2));for(let l=0;l<=a;l++){const p=l/a;l>0?(addPin(o-r*p,n-s*(1-p)),addPin(o+r*p,n-s*(1-p)),addPin(o-r*(1-p),n+s*p),addPin(o+r*(1-p),n+s*p)):(addPin(o,n-s),addPin(o,n+s),addPin(o-r,n),addPin(o+r,n))}baseRows>5&&addPin(o,n);break} case 'hourglass': { const r=baseRows,s=pinAreaHeight/2,o=pinAreaHeight/Math.max(1,r-1),n=startXOffset+pinAreaWidth/2,a=startY+s;for(let l=0;l<r;l++){const p=startY+l*o,t=Math.abs(p-a),e=Math.max(.1,t/s),i=pinAreaWidth*e,d=Math.max(1,Math.round((1+baseRows*e+baseCols*densityMultiplier*e)/2)),h=d>1?i/(d-1):0,c=n-i/2;for(let m=0;m<d;m++)addPin(c+m*h,p)}break} }
+        }
+
+        function createSlots(width, height, count, currentSlotValues) {
+            if (count < 1 || !currentSlotValues || currentSlotValues.length !== count) { console.error("Invalid slot count or values"); return; } const dividerHeight = SLOT_AREA_HEIGHT * 1.2; const dividerThickness = 8; const totalSlotAreaWidth = width; const slotBottomY = height - dividerThickness / 2; const dividerY = height - dividerHeight / 2; const sensorY = height - SLOT_AREA_HEIGHT / 2; const minSlotWidth = (ballRadius * 2) + 10; let slotWidth = totalSlotAreaWidth / count; if (slotWidth < minSlotWidth) { console.warn(`Slot width too small.`); slotWidth = minSlotWidth; } Composite.add(world, Bodies.rectangle(width / 2, slotBottomY, width, dividerThickness, { isStatic: true, label: 'slot_floor', render: { fillStyle: '#64748b' } })); let currentX = 0; for (let i = 0; i < count; i++) { if (i > 0) { Composite.add(world, Bodies.rectangle(currentX, dividerY, dividerThickness, dividerHeight, { isStatic: true, label: 'divider', render: { fillStyle: '#64748b' } })); } const sensorX = currentX + slotWidth / 2; const sensorWidth = Math.max(1, slotWidth - (i > 0 ? dividerThickness / 2 : 0) - (i < count - 1 ? dividerThickness / 2 : 0)); const sensor = Bodies.rectangle(sensorX, sensorY, sensorWidth, SLOT_AREA_HEIGHT * 0.8, { isStatic: true, isSensor: true, label: `slot_${i}`, slotValue: currentSlotValues[i], render: { visible: false } }); Composite.add(world, sensor); currentX += slotWidth; }
+        }
+
+        function generateSlotValues(count) {
+             switch (count) { case 2: return [10, 100]; case 3: return [10, 100, 10]; case 4: return [30, 10, 100, 30]; case 5: return [30, 10, 100, 10, 30]; case 6: return [30, 10, 20, 100, 10, 30]; case 7: return [30, 10, 20, 100, 20, 10, 30]; case 8: return [30, 10, 20, 10, 100, 20, 10, 30]; case 9: return [30, 10, 50, 10, 100, 10, 50, 10, 30]; case 10: return [30, 10, 50, 10, 20, 100, 10, 50, 10, 30]; case 11: return [30, 10, 50, 10, 30, 100, 30, 10, 50, 10, 30]; default: console.warn(`Unsupported slot count: ${count}.`); return [30, 10, 100, 10, 30]; }
+        }
+
+        function updateSlotValueDisplay() {
+            slotValueDisplay.textContent = slotValues && slotValues.length > 0 ? slotValues.join(' | ') : "N/A";
+        }
+
+        function displaySlotScores(scores, canvasWidth, canvasHeight) {
+            if (!scores || scores.length === 0) return; scoreContainer.innerHTML = ''; const count = scores.length; const totalSlotAreaWidth = canvasWidth; const minSlotWidth = (ballRadius * 2) + 10; let slotWidth = totalSlotAreaWidth / count; if (slotWidth < minSlotWidth) { slotWidth = minSlotWidth; } let currentX = 0; for (let i = 0; i < count; i++) { const score = scores[i]; const scoreLabel = document.createElement('span'); scoreLabel.classList.add('score-label'); scoreLabel.textContent = score; const slotCenterX = currentX + slotWidth / 2; scoreLabel.style.left = `${slotCenterX}px`; scoreContainer.appendChild(scoreLabel); currentX += slotWidth; }
+        }
+
+        function createBall(x, y) {
+            if (currentBall && Composite.get(world, currentBall.id, 'body')) { Composite.remove(world, currentBall); } const ballOptions = { restitution: 0.8, friction: 0.05, density: 0.005, label: 'ball', collisionFilter: { category: 0x0001, mask: 0xFFFFFFFF }, render: { fillStyle: '#ef4444' } }; currentBall = Bodies.circle(x, y, ballRadius, ballOptions); Composite.add(world, currentBall); return currentBall;
+        }
+
+        function resetBallState() {
+            if (currentBall && Composite.get(world, currentBall.id, 'body')) { Composite.remove(world, currentBall); } currentBall = null; ballDragging = false; ballPickupArea.style.backgroundColor = '#ef4444'; ballPickupArea.style.opacity = '1'; ballPickupArea.style.cursor = 'grab';
+        }
+
+        function setupDragDrop() {
+             let o=0,f=0;const t=e=>{let l=e.target,n=!1;for(;null!=l;){if("ballPickupArea"===l.id){n=!0;break}l=l.parentElement}if(!currentBall&&n&&render&&render.canvas){ballDragging=!0,ballPickupArea.style.cursor="grabbing",ballPickupArea.style.opacity="0.5";const i=render.canvas.getBoundingClientRect(),a=e.clientX-i.left,d=e.clientY-i.top;currentBall=createBall(a,d),Body.setStatic(currentBall,!0),o=currentBall.position.x-a,f=currentBall.position.y-d,window.addEventListener("mousemove",s),window.addEventListener("mouseup",r)}},s=e=>{if(ballDragging&&currentBall&&render&&render.canvas){const l=render.canvas.getBoundingClientRect(),n=e.clientX-l.left,i=e.clientY-l.top;Body.setPosition(currentBall,{x:n+o,y:i+f})}},r=e=>{if(ballDragging&&currentBall&&render&&render.canvas){ballDragging=!1,window.removeEventListener("mousemove",s),window.removeEventListener("mouseup",r);const l=render.canvas.getBoundingClientRect(),n=e.clientX-l.left,i=e.clientY-l.top,a={x:n+o,y:i+f};a.x>0&&a.x<render.options.width&&a.y>0&&a.y<render.options.height-SLOT_AREA_HEIGHT?(Body.setStatic(currentBall,!1),Body.setPosition(currentBall,a),Body.setVelocity(currentBall,{x:0,y:0}),Body.setAngularVelocity(currentBall,0)):resetBallState()}else ballDragging&&(ballDragging=!1,window.removeEventListener("mousemove",s),window.removeEventListener("mouseup",r),resetBallState())};ballPickupArea.removeEventListener("mousedown",t),ballPickupArea.addEventListener("mousedown",t);
+         }
+
+        function setupCollisionHandling() {
+            if (!engine) return; Events.off(engine, 'collisionStart'); Events.on(engine, 'collisionStart', (e) => { const t = e.pairs; for (let o = 0; o < t.length; o++) { const l = t[o]; let n = null, s = null; "ball" === l.bodyA.label && l.bodyB.label.startsWith("slot_") ? (n = l.bodyA, s = l.bodyB) : "ball" === l.bodyB.label && l.bodyA.label.startsWith("slot_") && (n = l.bodyB, s = l.bodyA); if (n && s && !n.isSleeping && n === currentBall) { const i = s.slotValue; displayMessage(`Score: ${i}`), Body.set(n, "isSleeping", !0), Body.setStatic(n, !0), n.render.opacity = .5, n === currentBall && resetBallState() } } });
+        }
+
+        function displayMessage(text) {
+            messageBox.textContent = text; messageBox.classList.add('show'); setTimeout(() => messageBox.classList.remove('show'), 2500);
+        }
+
+        function setupDividerResizeHandling() {
+            let e,t;const o=l=>{isDividerResizing=!0,e=l.clientX,t=controlsPanel.offsetWidth,document.body.classList.add("no-select"),window.addEventListener("mousemove",n),window.addEventListener("mouseup",s)},n=l=>{if(!isDividerResizing)return;const i=l.clientX-e;let d=t+i;const a=200,r=window.innerWidth*.7;d=Math.max(a,Math.min(r,d)),controlsPanel.style.width=`${d}px`},s=()=>{isDividerResizing&&(isDividerResizing=!1,document.body.classList.remove("no-select"),window.removeEventListener("mousemove",n),window.removeEventListener("mouseup",s),initSimulation())};resizeDivider.removeEventListener("mousedown",o),resizeDivider.addEventListener("mousedown",o);
+        }
+
+        function setupAllEventListeners() {
+            pinShapeSelect.addEventListener('change', () => { initSimulation(); saveSettings(); });
+            numSlotsSlider.addEventListener('change', () => { initSimulation(); saveSettings(); });
+            ballSizeSlider.addEventListener('change', () => { initSimulation(); saveSettings(); });
+            pinDensitySlider.addEventListener('change', () => { initSimulation(); saveSettings(); });
+
+            pinDensitySlider.addEventListener('input', () => { pinDensityValue.textContent = pinDensitySlider.value; saveSettings(); });
+            ballSizeSlider.addEventListener('input', () => { const e = parseInt(ballSizeSlider.value); ballSizeValue.textContent = e; ballRadius = e; const t = 2 * e; ballPickupArea.style.width = `${t+4}px`; ballPickupArea.style.height = `${t+4}px`; saveSettings(); });
+            numSlotsSlider.addEventListener('input', () => { numSlotsValue.textContent = numSlotsSlider.value; saveSettings(); });
+
+            resetButton.addEventListener('click', initSimulation);
+
+            setupDragDrop();
+            setupDividerResizeHandling();
+        }
+
+        window.onload = () => {
+            if (chrome && chrome.storage && chrome.storage.local) {
+                chrome.storage.local.get(STORAGE_KEY, (result) => {
+                    if (chrome.runtime.lastError) { console.error("Error loading settings:", chrome.runtime.lastError); applySettings(defaultSettings); }
+                    else {
+                        const loadedSettings = result[STORAGE_KEY] || {};
+                        const mergedSettings = {...defaultSettings, ...loadedSettings};
+                        delete mergedSettings.pinBounciness;
+                        applySettings(mergedSettings);
+                    }
+                });
+            } else {
+                console.warn("chrome.storage.local not available.");
+                applySettings(defaultSettings);
+            }
+        };
+
+    </script>
+
+</body>
+</html>
