@@ -10,10 +10,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
         body {
             font-family: 'Inter', sans-serif;
-            overflow: hidden;
             background-color: #f0f4f8;
+            display: flex;
+            flex-direction: column;
+        }
+        #main-content-area {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+            height: 0;
         }
         input[type="range"] {
             -webkit-appearance: none;
@@ -131,6 +144,7 @@
         #simulationContainer {
             position: relative;
             overflow: hidden;
+            flex-grow: 1;
         }
         #scoreContainer {
             position: absolute;
@@ -153,151 +167,140 @@
             white-space: nowrap;
             text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.5);
         }
+        #navbar {
+             user-select: none;
+             display: flex;
+             justify-content: space-between;
+             align-items: stretch;
+             background-color: #2c3e50;
+             padding: 0; margin: 0;
+             width: 100%;
+             z-index: 1000;
+             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+             height: 55px;
+             line-height: 55px;
+             flex-shrink: 0;
+        }
+        .navbar-link {
+             color: #ecf0f1; text-decoration: none; padding: 0 25px; font-size: 1.1em; font-weight: bold; display: flex; align-items: center; transition: background-color 0.3s ease;
+        }
+        .navbar-dropdown-container {
+             user-select: none; position: relative; display: inline-block;
+        }
+        .navbar-dropdown-button {
+            background-color: transparent; color: #ecf0f1; border: none; padding: 0 20px; cursor: pointer; font-size: 1em; height: 100%; transition: background-color 0.3s ease; display: flex; align-items: center;
+        }
+        .navbar-dropdown-content {
+            display: none; position: absolute; right: 0; top: 100%; background-color: #34495e; min-width: 200px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1; border-radius: 0 0 4px 4px; overflow: hidden; line-height: 1.5;
+        }
+        .navbar-dropdown-link {
+            color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;
+        }
+        .navbar-dropdown-container:hover .navbar-dropdown-content {
+            display: block;
+        }
+        .navbar-link:hover, .navbar-dropdown-button:hover, .navbar-dropdown-link:hover {
+            background-color: #34495e;
+        }
+        .navbar-dropdown-link:hover {
+             background-color: #4a627a;
+        }
+
     </style>
 </head>
-<body class="bg-gray-100 flex h-screen no-select">
-
-    <div style="user-select: none; display: flex; justify-content: space-between; align-items: stretch; background-color: #2c3e50; padding: 0; margin: 0; width: 100%; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 55px; line-height: 55px;">
-        <a href="index.html" style="color: #ecf0f1; text-decoration: none; padding: 0 25px; font-size: 1.1em; font-weight: bold; display: flex; align-items: center; transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">Home</a>
+<body class="no-select">
+    <div id="navbar">
+        <a href="index.html" class="navbar-link">Home</a>
         <div style="display: flex; align-items: stretch;">
-            <div style="user-select: none; position: relative; display: inline-block;" onmouseover="this.children[1].style.display='block'" onmouseout="this.children[1].style.display='none'">
-                <button style="background-color: transparent; color: #ecf0f1; border: none; padding: 0 20px; cursor: pointer; font-size: 1em; height: 100%; transition: background-color 0.3s ease; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">
-                    Games &#9662; </button>
-                <div style="display: none; position: absolute; right: 0; top: 100%; background-color: #34495e; min-width: 200px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1; border-radius: 0 0 4px 4px; overflow: hidden; line-height: 1.5;">
-                    <a href="poker.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Poker</a>
-                    <a href="snake.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Snake</a>
-                    <a href="minesweeper.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Minesweeper</a>
+            <div class="navbar-dropdown-container">
+                <button class="navbar-dropdown-button">Games &#9662;</button>
+                <div class="navbar-dropdown-content" style="min-width: 200px;">
+                    <a href="poker.html" class="navbar-dropdown-link">Poker</a>
+                    <a href="snake.html" class="navbar-dropdown-link">Snake</a>
+                    <a href="minesweeper.html" class="navbar-dropdown-link">Minesweeper</a>
+                    <a href="pinball.html" class="navbar-dropdown-link">Pinball</a>
                 </div>
             </div>
-            <div style="position: relative; display: inline-block;" onmouseover="this.children[1].style.display='block'" onmouseout="this.children[1].style.display='none'">
-                <button style="user-select: none; background-color: transparent; color: #ecf0f1; border: none; padding: 0 20px; cursor: pointer; font-size: 1em; height: 100%; transition: background-color 0.3s ease; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">
-                    Math &#9662;
-                </button>
-                <div style="display: none; position: absolute; right: 0; top: 100%; background-color: #34495e; min-width: 280px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1; border-radius: 0 0 4px 4px; overflow: hidden; line-height: 1.5;">
-                    <a href="Graphing_Calculator.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Graphing Calculator</a>
-                    <a href="Interactive_Fractal_Generator.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Interactive Fractal Generator</a>
-                    <a href="Significance_Tests_and_Confidence_Intervals.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Significance Tests and CIs</a>
+            <div class="navbar-dropdown-container">
+                <button class="navbar-dropdown-button">Math &#9662;</button>
+                <div class="navbar-dropdown-content" style="min-width: 280px;">
+                    <a href="Graphing_Calculator.html" class="navbar-dropdown-link">Graphing Calculator</a>
+                    <a href="Interactive_Fractal_Generator.html" class="navbar-dropdown-link">Interactive Fractal Generator</a>
+                    <a href="Significance_Tests_and_Confidence_Intervals.html" class="navbar-dropdown-link">Significance Tests and CIs</a>
                 </div>
             </div>
-            <div style="user-select: none; position: relative; display: inline-block;" onmouseover="this.children[1].style.display='block'" onmouseout="this.children[1].style.display='none'">
-                <button style="background-color: transparent; color: #ecf0f1; border: none; padding: 0 20px; cursor: pointer; font-size: 1em; height: 100%; transition: background-color 0.3s ease; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">
-                    HTML &#9662;
-                </button>
-                <div style="display: none; position: absolute; right: 0; top: 100%; background-color: #34495e; min-width: 280px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1; border-radius: 0 0 4px 4px; overflow: hidden; line-height: 1.5;">
-                    <a href="Google_Docs_Style_Editor.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Google Docs Style Editor</a>
-                    <a href="UI_Color_Builder.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">UI Color Builder</a>
-                    <a href="Text_Editor_with_Terminal.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Text Editor with Terminal</a>
+            <div class="navbar-dropdown-container">
+                <button class="navbar-dropdown-button">HTML &#9662;</button>
+                <div class="navbar-dropdown-content" style="min-width: 280px;">
+                    <a href="Google_Docs_Style_Editor.html" class="navbar-dropdown-link">Google Docs Style Editor</a>
+                    <a href="UI_Color_Builder.html" class="navbar-dropdown-link">UI Color Builder</a>
+                    <a href="Text_Editor_with_Terminal.html" class="navbar-dropdown-link">Text Editor with Terminal</a>
                 </div>
             </div>
-            <div style="user-select: none; position: relative; display: inline-block;" onmouseover="this.children[1].style.display='block'" onmouseout="this.children[1].style.display='none'">
-                <button style="background-color: transparent; color: #ecf0f1; border: none; padding: 0 20px; cursor: pointer; font-size: 1em; height: 100%; transition: background-color 0.3s ease; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">
-                    Others &#9662;
-                </button>
-                <div style="display: none; position: absolute; right: 0; top: 100%; background-color: #34495e; min-width: 250px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1; border-radius: 0 0 4px 4px; overflow: hidden; line-height: 1.5;">
-                    <a href="Task_Tracker.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Task Tracker</a>
-                    <a href="ASCII_Art_Generator.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">ASCII Art Generator</a>
-                    <a href="Interactive_Electoral_Map.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Interactive Electoral Map</a>
+            <div class="navbar-dropdown-container">
+                <button class="navbar-dropdown-button">Others &#9662;</button>
+                <div class="navbar-dropdown-content" style="min-width: 250px;">
+                    <a href="Task_Tracker.html" class="navbar-dropdown-link">Task Tracker</a>
+                    <a href="ASCII_Art_Generator.html" class="navbar-dropdown-link">ASCII Art Generator</a>
+                    <a href="Interactive_Electoral_Map.html" class="navbar-dropdown-link">Interactive Electoral Map</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <div style="user-select: none; display: flex; justify-content: space-between; align-items: stretch; background-color: #2c3e50; padding: 0; margin: 0; width: 100%; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 55px; line-height: 55px;">
-        <a href="index.html" style="color: #ecf0f1; text-decoration: none; padding: 0 25px; font-size: 1.1em; font-weight: bold; display: flex; align-items: center; transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">Home</a>
-        <div style="display: flex; align-items: stretch;">
-            <div style="user-select: none; position: relative; display: inline-block;" onmouseover="this.children[1].style.display='block'" onmouseout="this.children[1].style.display='none'">
-                <button style="background-color: transparent; color: #ecf0f1; border: none; padding: 0 20px; cursor: pointer; font-size: 1em; height: 100%; transition: background-color 0.3s ease; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">
-                    Games &#9662; </button>
-                <div style="display: none; position: absolute; right: 0; top: 100%; background-color: #34495e; min-width: 200px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1; border-radius: 0 0 4px 4px; overflow: hidden; line-height: 1.5;">
-                    <a href="poker.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Poker</a>
-                    <a href="snake.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Snake</a>
-                    <a href="minesweeper.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Minesweeper</a>
-                </div>
-            </div>
-            <div style="position: relative; display: inline-block;" onmouseover="this.children[1].style.display='block'" onmouseout="this.children[1].style.display='none'">
-                <button style="user-select: none; background-color: transparent; color: #ecf0f1; border: none; padding: 0 20px; cursor: pointer; font-size: 1em; height: 100%; transition: background-color 0.3s ease; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">
-                    Math &#9662;
-                </button>
-                <div style="display: none; position: absolute; right: 0; top: 100%; background-color: #34495e; min-width: 280px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1; border-radius: 0 0 4px 4px; overflow: hidden; line-height: 1.5;">
-                    <a href="Graphing_Calculator.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Graphing Calculator</a>
-                    <a href="Interactive_Fractal_Generator.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Interactive Fractal Generator</a>
-                    <a href="Significance_Tests_and_Confidence_Intervals.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Significance Tests and CIs</a>
-                </div>
-            </div>
-            <div style="user-select: none; position: relative; display: inline-block;" onmouseover="this.children[1].style.display='block'" onmouseout="this.children[1].style.display='none'">
-                <button style="background-color: transparent; color: #ecf0f1; border: none; padding: 0 20px; cursor: pointer; font-size: 1em; height: 100%; transition: background-color 0.3s ease; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">
-                    HTML &#9662;
-                </button>
-                <div style="display: none; position: absolute; right: 0; top: 100%; background-color: #34495e; min-width: 280px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1; border-radius: 0 0 4px 4px; overflow: hidden; line-height: 1.5;">
-                    <a href="Google_Docs_Style_Editor.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Google Docs Style Editor</a>
-                    <a href="UI_Color_Builder.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">UI Color Builder</a>
-                    <a href="Text_Editor_with_Terminal.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Text Editor with Terminal</a>
-                </div>
-            </div>
-            <div style="user-select: none; position: relative; display: inline-block;" onmouseover="this.children[1].style.display='block'" onmouseout="this.children[1].style.display='none'">
-                <button style="background-color: transparent; color: #ecf0f1; border: none; padding: 0 20px; cursor: pointer; font-size: 1em; height: 100%; transition: background-color 0.3s ease; display: flex; align-items: center;" onmouseover="this.style.backgroundColor='#34495e'" onmouseout="this.style.backgroundColor='transparent'">
-                    Others &#9662;
-                </button>
-                <div style="display: none; position: absolute; right: 0; top: 100%; background-color: #34495e; min-width: 250px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1; border-radius: 0 0 4px 4px; overflow: hidden; line-height: 1.5;">
-                    <a href="Task_Tracker.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Task Tracker</a>
-                    <a href="ASCII_Art_Generator.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">ASCII Art Generator</a>
-                    <a href="Interactive_Electoral_Map.html" style="color: #ecf0f1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.95em; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#4a627a'" onmouseout="this.style.backgroundColor='transparent'">Interactive Electoral Map</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="main-content-area">
+        <div id="controlsPanel" class="w-96 bg-white shadow-lg p-4 space-y-4 overflow-y-auto controls-container flex flex-col flex-shrink-0">
+            <h2 class="text-xl font-bold text-gray-700 text-center">Controls</h2>
 
-    <div id="controlsPanel" class="w-96 bg-white shadow-lg p-4 space-y-4 overflow-y-auto controls-container flex flex-col flex-shrink-0">
-        <h2 class="text-xl font-bold text-gray-700 text-center">Controls</h2>
+            <div class="text-center space-y-2 pt-2">
+                 <p class="text-sm text-gray-600">Click & Drag Ball:</p>
+                 <div id="ballPickupArea" class="bg-red-500 rounded-full mx-auto border-2 border-red-700 shadow-md flex items-center justify-center">
+                     </div>
+            </div>
 
-        <div class="text-center space-y-2 pt-2">
-             <p class="text-sm text-gray-600">Click & Drag Ball:</p>
-             <div id="ballPickupArea" class="bg-red-500 rounded-full mx-auto border-2 border-red-700 shadow-md flex items-center justify-center">
+            <div class="space-y-3 flex-grow">
+                <div>
+                    <label for="pinShapeSelect" class="block text-sm font-medium text-gray-700">Pin Layout:</label>
+                    <select id="pinShapeSelect" name="pinShape">
+                        <option value="square" selected>Square</option>
+                        <option value="triangle">Trapezoid</option>
+                        <option value="triangle_inverted">Inverted Trapezoid</option>
+                        <option value="oval">Oval</option>
+                        <option value="diamond">Diamond</option>
+                        <option value="hourglass">Hourglass</option>
+                        </select>
+                </div>
+                <div>
+                    <label for="pinDensitySlider" class="block text-sm font-medium text-gray-700">Pin Density Factor: <span id="pinDensityValue">15</span></label>
+                    <input type="range" id="pinDensitySlider" min="3" max="20" value="15" class="w-full">
+                </div>
+                 <div>
+                    <label for="ballSizeSlider" class="block text-sm font-medium text-gray-700">Ball Size: <span id="ballSizeValue">10</span>px</label>
+                    <input type="range" id="ballSizeSlider" min="5" max="20" value="10" class="w-full">
+                </div>
+                <div>
+                    <label for="numSlotsSlider" class="block text-sm font-medium text-gray-700">Number of Slots: <span id="numSlotsValue">7</span></label>
+                    <input type="range" id="numSlotsSlider" min="2" max="11" value="7" class="w-full">
+                </div>
+                <div>
+                     <label class="block text-sm font-medium text-gray-700">Slot Distribution</label>
+                     <div id="slotValueDisplay" class="mt-1 text-xs text-center text-gray-600 bg-gray-100 p-1 rounded">30 | 10 | 20 | 100 | 20 | 10 | 30</div>
                  </div>
+            </div>
+
+            <button id="resetButton" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out">
+                Reset
+            </button>
         </div>
 
-        <div class="space-y-3 flex-grow">
-            <div>
-                <label for="pinShapeSelect" class="block text-sm font-medium text-gray-700">Pin Layout:</label>
-                <select id="pinShapeSelect" name="pinShape">
-                    <option value="square" selected>Square</option>
-                    <option value="triangle">Trapezoid</option>
-                    <option value="triangle_inverted">Inverted Trapezoid</option>
-                    <option value="oval">Oval</option>
-                    <option value="diamond">Diamond</option>
-                    <option value="hourglass">Hourglass</option>
-                    </select>
-            </div>
-            <div>
-                <label for="pinDensitySlider" class="block text-sm font-medium text-gray-700">Pin Density Factor: <span id="pinDensityValue">15</span></label>
-                <input type="range" id="pinDensitySlider" min="3" max="20" value="15" class="w-full">
-            </div>
-             <div>
-                <label for="ballSizeSlider" class="block text-sm font-medium text-gray-700">Ball Size: <span id="ballSizeValue">10</span>px</label>
-                <input type="range" id="ballSizeSlider" min="5" max="20" value="10" class="w-full">
-            </div>
-            <div>
-                <label for="numSlotsSlider" class="block text-sm font-medium text-gray-700">Number of Slots: <span id="numSlotsValue">7</span></label>
-                <input type="range" id="numSlotsSlider" min="2" max="11" value="7" class="w-full">
-            </div>
-            <div>
-                 <label class="block text-sm font-medium text-gray-700">Slot Distribution</label>
-                 <div id="slotValueDisplay" class="mt-1 text-xs text-center text-gray-600 bg-gray-100 p-1 rounded">30 | 10 | 20 | 100 | 20 | 10 | 30</div>
-             </div>
+        <div id="resizeDivider"></div>
+
+        <div id="simulationContainer" class="flex-grow bg-gray-300 relative">
+            <div id="scoreContainer"></div>
+            <div id="messageBox">Score: 100</div>
         </div>
-
-        <button id="resetButton" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out">
-            Reset
-        </button>
     </div>
-
-    <div id="resizeDivider"></div>
-
-    <div id="simulationContainer" class="flex-grow bg-gray-300 relative">
-        <div id="scoreContainer"></div>
-        <div id="messageBox">Score: 100</div>
-    </div>
-
     <script>
         const Engine = Matter.Engine;
         const Render = Matter.Render;
@@ -352,84 +355,28 @@
         };
 
         function saveSettings() {
-            const settingsToSave = {
-                pinShape: pinShapeSelect.value,
-                pinDensity: parseInt(pinDensitySlider.value),
-                ballSize: parseInt(ballSizeSlider.value),
-                numSlots: parseInt(numSlotsSlider.value)
-             };
-            if (chrome && chrome.storage && chrome.storage.local) {
-                 chrome.storage.local.set({ [STORAGE_KEY]: settingsToSave }, () => {
-                     if (chrome.runtime.lastError) console.error("Error saving settings:", chrome.runtime.lastError);
-                 });
-             } else {
-                 console.warn("chrome.storage.local not available. Settings will not be saved.");
-             }
+            const settingsToSave = { pinShape: pinShapeSelect.value, pinDensity: parseInt(pinDensitySlider.value), ballSize: parseInt(ballSizeSlider.value), numSlots: parseInt(numSlotsSlider.value) };
+            if (chrome && chrome.storage && chrome.storage.local) { chrome.storage.local.set({ [STORAGE_KEY]: settingsToSave }, () => { if (chrome.runtime.lastError) console.error("Error saving settings:", chrome.runtime.lastError); }); }
+            else { console.warn("chrome.storage.local not available. Settings will not be saved."); }
         }
 
         function applySettings(settings) {
-            pinShapeSelect.value = settings.pinShape;
-            pinDensitySlider.value = settings.pinDensity;
-            ballSizeSlider.value = settings.ballSize;
-            numSlotsSlider.value = settings.numSlots;
-
-            pinDensityValue.textContent = settings.pinDensity;
-            ballSizeValue.textContent = settings.ballSize;
-            numSlotsValue.textContent = settings.numSlots;
-
-            pinShape = settings.pinShape;
-            ballRadius = settings.ballSize;
-            numSlots = settings.numSlots;
-
-            const initialBallDiameter = ballRadius * 2;
-            ballPickupArea.style.width = `${initialBallDiameter + 4}px`;
-            ballPickupArea.style.height = `${initialBallDiameter + 4}px`;
-
-            setupAllEventListeners();
-            initSimulation();
+            pinShapeSelect.value = settings.pinShape; pinDensitySlider.value = settings.pinDensity; ballSizeSlider.value = settings.ballSize; numSlotsSlider.value = settings.numSlots;
+            pinDensityValue.textContent = settings.pinDensity; ballSizeValue.textContent = settings.ballSize; numSlotsValue.textContent = settings.numSlots;
+            pinShape = settings.pinShape; ballRadius = settings.ballSize; numSlots = settings.numSlots;
+            const initialBallDiameter = ballRadius * 2; ballPickupArea.style.width = `${initialBallDiameter + 4}px`; ballPickupArea.style.height = `${initialBallDiameter + 4}px`;
+            setupAllEventListeners(); initSimulation();
         }
 
         function initSimulation() {
-            if (render) { Events.off(render); Render.stop(render); if (render.canvas) render.canvas.remove(); render.textures = {}; }
-            if (runner) Runner.stop(runner);
-            if (engine) { Events.off(engine); Composite.clear(engine.world, false); Engine.clear(engine); }
-
-            const canvasWidth = simulationContainer.offsetWidth;
-            const canvasHeight = simulationContainer.offsetHeight;
-            const finalCanvasWidth = Math.max(100, canvasWidth);
-            const finalCanvasHeight = Math.max(100, canvasHeight);
-
-            pinShape = pinShapeSelect.value;
-            const pinDensityFactor = parseInt(pinDensitySlider.value);
-            ballRadius = parseInt(ballSizeSlider.value);
-            numSlots = parseInt(numSlotsSlider.value);
-
-            pinDensityValue.textContent = pinDensityFactor;
-            ballSizeValue.textContent = ballRadius;
-            numSlotsValue.textContent = numSlots;
-
-            engine = Engine.create({ gravity: { x: 0, y: 1 } });
-            world = engine.world;
-            render = Render.create({ element: simulationContainer, engine: engine, options: { width: finalCanvasWidth, height: finalCanvasHeight, wireframes: false, background: '#cbd5e1' } });
-            runner = Runner.create();
-
-            slotValues = generateSlotValues(numSlots);
-            createBoundaries(finalCanvasWidth, finalCanvasHeight);
-            createPins(finalCanvasWidth, finalCanvasHeight, pinDensityFactor, 5, pinShape);
-            createSlots(finalCanvasWidth, finalCanvasHeight, numSlots, slotValues);
-            updateSlotValueDisplay();
-            displaySlotScores(slotValues, finalCanvasWidth, finalCanvasHeight);
-
-            const mouse = Mouse.create(render.canvas);
-            mouseConstraint = MouseConstraint.create(engine, { mouse: mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
-            mouseConstraint.collisionFilter.mask = 0x0001;
-            Composite.add(world, mouseConstraint);
-            render.mouse = mouse;
-
-            setupCollisionHandling();
-            Runner.run(runner, engine);
-            Render.run(render);
-
+            if (render) { Events.off(render); Render.stop(render); if (render.canvas) render.canvas.remove(); render.textures = {}; } if (runner) Runner.stop(runner); if (engine) { Events.off(engine); Composite.clear(engine.world, false); Engine.clear(engine); }
+            const canvasWidth = simulationContainer.offsetWidth; const canvasHeight = simulationContainer.offsetHeight; const finalCanvasWidth = Math.max(100, canvasWidth); const finalCanvasHeight = Math.max(100, canvasHeight);
+            pinShape = pinShapeSelect.value; const pinDensityFactor = parseInt(pinDensitySlider.value); ballRadius = parseInt(ballSizeSlider.value); numSlots = parseInt(numSlotsSlider.value);
+            pinDensityValue.textContent = pinDensityFactor; ballSizeValue.textContent = ballRadius; numSlotsValue.textContent = numSlots;
+            engine = Engine.create({ gravity: { x: 0, y: 1 } }); world = engine.world; render = Render.create({ element: simulationContainer, engine: engine, options: { width: finalCanvasWidth, height: finalCanvasHeight, wireframes: false, background: '#cbd5e1' } }); runner = Runner.create();
+            slotValues = generateSlotValues(numSlots); createBoundaries(finalCanvasWidth, finalCanvasHeight); createPins(finalCanvasWidth, finalCanvasHeight, pinDensityFactor, 5, pinShape); createSlots(finalCanvasWidth, finalCanvasHeight, numSlots, slotValues); updateSlotValueDisplay(); displaySlotScores(slotValues, finalCanvasWidth, finalCanvasHeight);
+            const mouse = Mouse.create(render.canvas); mouseConstraint = MouseConstraint.create(engine, { mouse: mouse, constraint: { stiffness: 0.2, render: { visible: false } } }); mouseConstraint.collisionFilter.mask = 0x0001; Composite.add(world, mouseConstraint); render.mouse = mouse;
+            setupCollisionHandling(); Runner.run(runner, engine); Render.run(render);
             if (!isDividerResizing) resetBallState();
         }
 
@@ -438,9 +385,7 @@
         }
 
         function createPins(width, height, densityFactor, pinRadius, shape) {
-             if (densityFactor < 1) densityFactor = 1;
-             const pinOptions = { isStatic: true, restitution: effectivePinBounciness, friction: 0.1, label: 'pin', render: { fillStyle: '#475569' }};
-             const pinAreaHeight = height * 0.6; const buffer = pinRadius + 2; const pinAreaWidth = Math.max(pinRadius * 4, width - (buffer * 2)); const startY = height * 0.20; const startXOffset = buffer; const endY = height - SLOT_AREA_HEIGHT - buffer; const baseSpacing = Math.max(pinRadius * 4, 75 - densityFactor * 2); const baseRows = Math.max(3, Math.floor(pinAreaHeight / baseSpacing)); const baseCols = Math.max(3, Math.floor(pinAreaWidth / baseSpacing)); const addPin = (x, y) => { const clampedX = Math.max(buffer + pinRadius, Math.min(width - buffer - pinRadius, x)); const clampedY = Math.max(startY + pinRadius, Math.min(endY - pinRadius, y)); if (clampedY >= startY + pinRadius && clampedY <= endY - pinRadius) { Composite.add(world, Bodies.circle(clampedX, clampedY, pinRadius, pinOptions)); return { x: clampedX, y: clampedY }; } return null; }; const densityMultiplier = 1.5; switch (shape) { case 'triangle': { const r=Math.max(3,densityFactor),s=pinAreaHeight/Math.max(1,r-1);for(let o=0;o<r;o++){const n=Math.max(2,Math.floor((o+2+baseCols*densityMultiplier)/2)),a=startY+o*s,l=n>1?pinAreaWidth/(n-1):0,p=startXOffset;for(let t=0;t<n;t++)addPin(p+t*l,a)}break} case 'triangle_inverted': { const r=Math.max(3,densityFactor),s=pinAreaHeight/Math.max(1,r-1);for(let o=0;o<r;o++){const n=r+1-o,a=Math.max(2,Math.floor((n+baseCols*densityMultiplier)/2)),l=startY+o*s,p=a>1?pinAreaWidth/(a-1):0,t=startXOffset;for(let e=0;e<a;e++)addPin(t+e*p,l)}break} case 'square': default: { const r=baseRows,s=baseCols,o=s>1?pinAreaWidth/(s-1):pinAreaWidth,n=r>1?pinAreaHeight/(r-1):pinAreaHeight;for(let a=0;a<r;a++){const l=startY+a*n,p=a%2==1?o/2:0,t=a%2==1?s-1:s;for(let e=0;e<t;e++)t>0&&addPin(startXOffset+p+e*o,l)}break} case 'oval': { const r=pinAreaWidth/2,s=pinAreaHeight/2,o=Math.max(1,Math.floor(baseRows/2)),n=1+pinAreaWidth/800,a=startXOffset+r,l=startY+s;baseRows>0&&addPin(a,l);for(let p=1;p<=o;p++){const t=(p/o)*r,e=(p/o)*s,i=Math.max(6,Math.floor((baseRows*(1.5*densityMultiplier)+p*(3*densityMultiplier))*n));for(let d=0;d<i;d++){const h=(d/i)*Math.PI*2;addPin(a+t*Math.cos(h),l+e*Math.sin(h))}}break} case 'diamond': { const r=pinAreaWidth/2,s=pinAreaHeight/2,o=startXOffset+r,n=startY+s,a=Math.max(2,Math.floor((baseRows*.8+baseCols*densityMultiplier)/2));for(let l=0;l<=a;l++){const p=l/a;l>0?(addPin(o-r*p,n-s*(1-p)),addPin(o+r*p,n-s*(1-p)),addPin(o-r*(1-p),n+s*p),addPin(o+r*(1-p),n+s*p)):(addPin(o,n-s),addPin(o,n+s),addPin(o-r,n),addPin(o+r,n))}baseRows>5&&addPin(o,n);break} case 'hourglass': { const r=baseRows,s=pinAreaHeight/2,o=pinAreaHeight/Math.max(1,r-1),n=startXOffset+pinAreaWidth/2,a=startY+s;for(let l=0;l<r;l++){const p=startY+l*o,t=Math.abs(p-a),e=Math.max(.1,t/s),i=pinAreaWidth*e,d=Math.max(1,Math.round((1+baseRows*e+baseCols*densityMultiplier*e)/2)),h=d>1?i/(d-1):0,c=n-i/2;for(let m=0;m<d;m++)addPin(c+m*h,p)}break} }
+             if (densityFactor < 1) densityFactor = 1; const pinOptions = { isStatic: true, restitution: effectivePinBounciness, friction: 0.1, label: 'pin', render: { fillStyle: '#475569' }}; const pinAreaHeight = height * 0.6; const buffer = pinRadius + 2; const pinAreaWidth = Math.max(pinRadius * 4, width - (buffer * 2)); const startY = height * 0.20; const startXOffset = buffer; const endY = height - SLOT_AREA_HEIGHT - buffer; const baseSpacing = Math.max(pinRadius * 4, 75 - densityFactor * 2); const baseRows = Math.max(3, Math.floor(pinAreaHeight / baseSpacing)); const baseCols = Math.max(3, Math.floor(pinAreaWidth / baseSpacing)); const addPin = (x, y) => { const clampedX = Math.max(buffer + pinRadius, Math.min(width - buffer - pinRadius, x)); const clampedY = Math.max(startY + pinRadius, Math.min(endY - pinRadius, y)); if (clampedY >= startY + pinRadius && clampedY <= endY - pinRadius) { Composite.add(world, Bodies.circle(clampedX, clampedY, pinRadius, pinOptions)); return { x: clampedX, y: clampedY }; } return null; }; const densityMultiplier = 1.5; switch (shape) { case 'triangle': { const r=Math.max(3,densityFactor),s=pinAreaHeight/Math.max(1,r-1);for(let o=0;o<r;o++){const n=Math.max(2,Math.floor((o+2+baseCols*densityMultiplier)/2)),a=startY+o*s,l=n>1?pinAreaWidth/(n-1):0,p=startXOffset;for(let t=0;t<n;t++)addPin(p+t*l,a)}break} case 'triangle_inverted': { const r=Math.max(3,densityFactor),s=pinAreaHeight/Math.max(1,r-1);for(let o=0;o<r;o++){const n=r+1-o,a=Math.max(2,Math.floor((n+baseCols*densityMultiplier)/2)),l=startY+o*s,p=a>1?pinAreaWidth/(a-1):0,t=startXOffset;for(let e=0;e<a;e++)addPin(t+e*p,l)}break} case 'square': default: { const r=baseRows,s=baseCols,o=s>1?pinAreaWidth/(s-1):pinAreaWidth,n=r>1?pinAreaHeight/(r-1):pinAreaHeight;for(let a=0;a<r;a++){const l=startY+a*n,p=a%2==1?o/2:0,t=a%2==1?s-1:s;for(let e=0;e<t;e++)t>0&&addPin(startXOffset+p+e*o,l)}break} case 'oval': { const r=pinAreaWidth/2,s=pinAreaHeight/2,o=Math.max(1,Math.floor(baseRows/2)),n=1+pinAreaWidth/800,a=startXOffset+r,l=startY+s;baseRows>0&&addPin(a,l);for(let p=1;p<=o;p++){const t=(p/o)*r,e=(p/o)*s,i=Math.max(6,Math.floor((baseRows*(1.5*densityMultiplier)+p*(3*densityMultiplier))*n));for(let d=0;d<i;d++){const h=(d/i)*Math.PI*2;addPin(a+t*Math.cos(h),l+e*Math.sin(h))}}break} case 'diamond': { const r=pinAreaWidth/2,s=pinAreaHeight/2,o=startXOffset+r,n=startY+s,a=Math.max(2,Math.floor((baseRows*.8+baseCols*densityMultiplier)/2));for(let l=0;l<=a;l++){const p=l/a;l>0?(addPin(o-r*p,n-s*(1-p)),addPin(o+r*p,n-s*(1-p)),addPin(o-r*(1-p),n+s*p),addPin(o+r*(1-p),n+s*p)):(addPin(o,n-s),addPin(o,n+s),addPin(o-r,n),addPin(o+r,n))}baseRows>5&&addPin(o,n);break} case 'hourglass': { const r=baseRows,s=pinAreaHeight/2,o=pinAreaHeight/Math.max(1,r-1),n=startXOffset+pinAreaWidth/2,a=startY+s;for(let l=0;l<r;l++){const p=startY+l*o,t=Math.abs(p-a),e=Math.max(.1,t/s),i=pinAreaWidth*e,d=Math.max(1,Math.round((1+baseRows*e+baseCols*densityMultiplier*e)/2)),h=d>1?i/(d-1):0,c=n-i/2;for(let m=0;m<d;m++)addPin(c+m*h,p)}break} }
         }
 
         function createSlots(width, height, count, currentSlotValues) {
